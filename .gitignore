@@ -12,5 +12,3 @@ wheels/
 # Environment variables
 .env
 
-*.md
-bruno/

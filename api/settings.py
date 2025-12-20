@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party apps
     "rest_framework",
+    "rest_framework_simplejwt",
     # Local apps
     "users",
     "rides",
@@ -49,6 +50,18 @@ INSTALLED_APPS = [
 
 # Custom User Model
 AUTH_USER_MODEL = "users.User"
+
+# Django REST Framework configuration
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "api.permissions.IsAdminUser",
+    ],
+}
+
+SIMPLE_JWT = {"USER_ID_FIELD": "id_user"}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
