@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Local apps
     "users",
+    "rides",
 ]
 
 # Custom User Model
