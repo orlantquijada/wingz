@@ -1,6 +1,6 @@
 # Wingz Ride API
 
-A Django REST API for managing ride-sharing data. Built with Django REST Framework, JWT authentication, and PostgreSQL.
+Built with Django REST Framework, JWT authentication, and PostgreSQL.
 
 ## Quick Start
 
@@ -28,7 +28,6 @@ A Django REST API for managing ride-sharing data. Built with Django REST Framewo
 
    ```bash
    cp .env.example .env
-   # Edit .env with your settings
    ```
 
 4. **Run migrations and start the server**:
@@ -37,6 +36,14 @@ A Django REST API for managing ride-sharing data. Built with Django REST Framewo
    uv run python manage.py migrate
    uv run python manage.py runserver
    ```
+
+5. **(Optional) Seed the database with sample data**:
+
+   ```bash
+   uv run python manage.py seed
+   ```
+
+Creates sample users, drivers, riders, and rides. Use `--clear` to reset data, or `--rides N` to specify ride count.
 
 The API will be available at `http://localhost:8000`.
 
@@ -206,7 +213,6 @@ ORDER BY "Month", "Driver";
 
 1. **CTEs for pickup/dropoff events** — First two CTEs pull out the timestamps for pickup and dropoff events separately.
 
-2. **Trip durations CTE** — Joins rides with their events to calculate how long each trip took. The `INNER JOIN` naturally filters out rides that don't have both events.
+2. **Trip durations CTE** — Joins rides with their events to calculate how long each trip took. The `INNER JOIN` to filter out rides that don't have both events.
 
 3. **Final aggregation** — Filters for trips over an hour, groups by month and driver, and formats the output. The driver name is formatted as "FirstName L" using `CONCAT` and `LEFT`.
-
