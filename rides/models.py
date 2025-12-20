@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -39,16 +40,48 @@ class Ride(models.Model):
         db_column="id_driver",
     )
 
-    pickup_latitude = models.FloatField()
-    pickup_longitude = models.FloatField()
+    pickup_latitude = models.FloatField(
+        validators=[MinValueValidator(-90), MaxValueValidator(90)]
+    )
+    pickup_longitude = models.FloatField(
+        validators=[MinValueValidator(-180), MaxValueValidator(180)]
+    )
 
-    dropoff_latitude = models.FloatField()
-    dropoff_longitude = models.FloatField()
+    dropoff_latitude = models.FloatField(
+        validators=[MinValueValidator(-90), MaxValueValidator(90)]
+    )
+    dropoff_longitude = models.FloatField(
+        validators=[MinValueValidator(-180), MaxValueValidator(180)]
+    )
 
     # unsure if this is estimated pickup time or actual pickup time (if so, this should be nullable)
     pickup_time = models.DateTimeField(db_index=True)
 
     objects = RideManager()
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(pickup_latitude__gte=-90, pickup_latitude__lte=90),
+                name="ride_pickup_latitude_range",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(
+                    pickup_longitude__gte=-180, pickup_longitude__lte=180
+                ),
+                name="ride_pickup_longitude_range",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(dropoff_latitude__gte=-90, dropoff_latitude__lte=90),
+                name="ride_dropoff_latitude_range",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(
+                    dropoff_longitude__gte=-180, dropoff_longitude__lte=180
+                ),
+                name="ride_dropoff_longitude_range",
+            ),
+        ]
 
     def __str__(self):
         return f"Ride {self.id_ride}: {self.status}"
