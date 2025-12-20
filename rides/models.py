@@ -5,6 +5,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
+from .queryset import RideQuerySet
+
 
 class RideStatus(models.TextChoices):
     EN_ROUTE = "en-route", "En Route"
@@ -12,7 +14,7 @@ class RideStatus(models.TextChoices):
     DROPOFF = "dropoff", "Dropoff"
 
 
-class RideManager(models.Manager):
+class RideManager(models.Manager.from_queryset(RideQuerySet)):
     def get_queryset(self):
         return super().get_queryset().select_related("id_rider", "id_driver")
 

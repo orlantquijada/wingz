@@ -3,7 +3,40 @@ from rest_framework import serializers
 from users.models import User
 from users.serializers import BaseUserSerializer
 
-from .models import Ride, RideEvent
+from .models import Ride, RideEvent, RideStatus
+
+
+class RideQueryParamsSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(
+        choices=RideStatus.choices,
+        required=False,
+    )
+    rider_email = serializers.EmailField(
+        required=False,
+    )
+
+    ORDERING_CHOICES = [
+        ("pickup_time", "Ascending by pickup time"),
+        ("-pickup_time", "Descending by pickup time"),
+        ("distance", "Ascending by distance from coordinates"),
+        ("-distance", "Descending by distance from coordinates"),
+    ]
+    ordering = serializers.ChoiceField(
+        choices=ORDERING_CHOICES,
+        required=False,
+        help_text="Sort rides by pickup_time or distance",
+    )
+
+    latitude = serializers.FloatField(
+        required=False,
+        min_value=-90,
+        max_value=90,
+    )
+    longitude = serializers.FloatField(
+        required=False,
+        min_value=-180,
+        max_value=180,
+    )
 
 
 class RideEventSerializer(serializers.ModelSerializer):
