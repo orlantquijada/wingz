@@ -45,6 +45,7 @@ class Ride(models.Model):
     dropoff_latitude = models.FloatField()
     dropoff_longitude = models.FloatField()
 
+    # unsure if this is estimated pickup time or actual pickup time (if so, this should be nullable)
     pickup_time = models.DateTimeField(db_index=True)
 
     objects = RideManager()
