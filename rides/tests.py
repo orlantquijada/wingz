@@ -199,13 +199,14 @@ class RideListPerformanceTests(BaseAPITestCase):
     def test_query_count_optimized(self):
         """
         Expected queries:
-        1. Rides with select_related for rider + driver
-        2. Today's RideEvents via prefetch_related
-        3. Pagination count (optional)
+        1. Auth user lookup
+        2. Pagination count
+        3. Rides with select_related for rider + driver
+        4. Today's RideEvents via prefetch_related
         """
         self._authenticate_as(self.admin_user)
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             response = self.client.get(RIDES_LIST_PATH)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -230,7 +231,7 @@ class RideListPerformanceTests(BaseAPITestCase):
     def test_no_n_plus_one_queries(self):
         self._authenticate_as(self.admin_user)
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             response = self.client.get(RIDES_LIST_PATH)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -272,8 +273,8 @@ class RideListResponseStructureTests(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         ride = response.data["results"][0]
 
-        self.assertIn("id_rider", ride)
-        rider = ride["id_rider"]
+        self.assertIn("rider", ride)
+        rider = ride["rider"]
         self.assertIn("email", rider)
         self.assertEqual(rider["email"], "rider@example.com")
 
@@ -284,8 +285,8 @@ class RideListResponseStructureTests(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         ride = response.data["results"][0]
 
-        self.assertIn("id_driver", ride)
-        driver = ride["id_driver"]
+        self.assertIn("driver", ride)
+        driver = ride["driver"]
         self.assertIn("email", driver)
         self.assertEqual(driver["email"], "driver@example.com")
 

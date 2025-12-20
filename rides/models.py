@@ -5,7 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
-from .queryset import RideQuerySet
+from .queryset import RideEventQuerySet, RideQuerySet
 
 
 class RideStatus(models.TextChoices):
@@ -15,8 +15,7 @@ class RideStatus(models.TextChoices):
 
 
 class RideManager(models.Manager.from_queryset(RideQuerySet)):
-    def get_queryset(self):
-        return super().get_queryset().select_related("id_rider", "id_driver")
+    pass
 
 
 class Ride(models.Model):
@@ -99,11 +98,8 @@ class RideEventType(models.TextChoices):
     # RIDER_CANCELLED = "Rider cancelled Ride"
 
 
-class RideEventManager(models.Manager):
-    def recent(self, hours: int = 24):
-        return self.get_queryset().filter(
-            created_at__gte=timezone.now() - timedelta(hours=hours)
-        )
+class RideEventManager(models.Manager.from_queryset(RideEventQuerySet)):
+    pass
 
 
 class RideEvent(models.Model):

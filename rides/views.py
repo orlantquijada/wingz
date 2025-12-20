@@ -13,7 +13,9 @@ class RideViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
 
     def get_queryset(self) -> QuerySet:
-        queryset = super().get_queryset()
+        queryset = (
+            super().get_queryset().with_rider_and_driver().with_todays_ride_events()
+        )
 
         params_serializer = RideQueryParamsSerializer(data=self.request.query_params)
         params_serializer.is_valid(raise_exception=True)
