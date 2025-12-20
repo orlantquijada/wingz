@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 from api.config import env
@@ -61,7 +62,11 @@ REST_FRAMEWORK = {
     ],
 }
 
-SIMPLE_JWT = {"USER_ID_FIELD": "id_user"}
+SIMPLE_JWT = {
+    "USER_ID_FIELD": "id_user",
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7) if env.DEBUG else timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30) if env.DEBUG else timedelta(days=1),
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
