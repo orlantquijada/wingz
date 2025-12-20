@@ -53,6 +53,16 @@ class Ride(models.Model):
         return f"Ride {self.id_ride}: {self.status}"
 
 
+class RideEventType(models.TextChoices):
+    STATUS_EN_ROUTE = "Status changed to en-route"
+    STATUS_PICKUP = "Status changed to pickup"
+    STATUS_DROPOFF = "Status changed to dropoff"
+
+    # we can still add more status here
+    # DRIVER_CANCELLED = "Driver cancelled Ride"
+    # RIDER_CANCELLED = "Rider cancelled Ride"
+
+
 class RideEventManager(models.Manager):
     def recent(self, hours: int = 24):
         return self.get_queryset().filter(
@@ -70,7 +80,11 @@ class RideEvent(models.Model):
         db_column="id_ride",
     )
 
-    description = models.CharField(max_length=255)
+    description = models.CharField(
+        max_length=50,
+        choices=RideEventType.choices,
+        db_index=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = RideEventManager()
