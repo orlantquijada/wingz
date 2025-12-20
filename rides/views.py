@@ -14,7 +14,11 @@ class RideViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self) -> QuerySet:
         queryset = (
-            super().get_queryset().with_rider_and_driver().with_todays_ride_events()
+            super()
+            .get_queryset()
+            .with_rider_and_driver()
+            .with_todays_ride_events()
+            .with_pickup_event_time()
         )
 
         params_serializer = RideQueryParamsSerializer(data=self.request.query_params)
@@ -29,7 +33,8 @@ class RideViewSet(viewsets.ModelViewSet):
 
         if ordering := validated_data.get("ordering"):
             if ordering in ("pickup_time", "-pickup_time"):
-                queryset = queryset.order_by(ordering)
+                order_field = ordering.replace("pickup_time", "pickup_event_time")
+                queryset = queryset.order_by(order_field)
             elif ordering in ("distance", "-distance"):
                 latitude = validated_data.get("latitude")
                 longitude = validated_data.get("longitude")

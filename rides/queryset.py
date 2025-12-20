@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import OuterRef, Prefetch, Subquery
 from django.db.models.functions import Power, Sqrt
 from django.utils import timezone
 
@@ -14,6 +14,18 @@ class RideEventQuerySet(models.QuerySet):
 class RideQuerySet(models.QuerySet):
     def with_rider_and_driver(self):
         return self.select_related("id_rider", "id_driver")
+
+    def with_pickup_event_time(self):
+        from .models import RideEvent, RideEventType  # avoid circular import
+
+        pickup_event = RideEvent.objects.filter(
+            id_ride=OuterRef("pk"),
+            description=RideEventType.STATUS_PICKUP,
+        ).order_by("-created_at")
+
+        return self.annotate(
+            pickup_event_time=Subquery(pickup_event.values("created_at")[:1])
+        )
 
     def with_todays_ride_events(self):
         from .models import RideEvent  # avoid circular import
