@@ -38,6 +38,15 @@ class RideQueryParamsSerializer(serializers.Serializer):
         max_value=180,
     )
 
+    def validate(self, attrs):
+        ordering = attrs.get("ordering")
+        if ordering in ("distance", "-distance"):
+            if "latitude" not in attrs or "longitude" not in attrs:
+                raise serializers.ValidationError(
+                    "latitude and longitude are required when ordering by distance"
+                )
+        return attrs
+
 
 class RideEventSerializer(serializers.ModelSerializer):
     class Meta:

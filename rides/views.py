@@ -28,5 +28,13 @@ class RideViewSet(viewsets.ModelViewSet):
         if ordering := validated_data.get("ordering"):
             if ordering in ("pickup_time", "-pickup_time"):
                 queryset = queryset.order_by(ordering)
+            elif ordering in ("distance", "-distance"):
+                latitude = validated_data.get("latitude")
+                longitude = validated_data.get("longitude")
+
+                if latitude is not None and longitude is not None:
+                    queryset = queryset.distance_from(latitude, longitude).order_by(
+                        ordering
+                    )
 
         return queryset
