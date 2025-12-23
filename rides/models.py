@@ -4,6 +4,17 @@ from django.db import models
 
 from .queryset import RideEventQuerySet, RideQuerySet
 
+LATITUDE_MIN = -90
+LATITUDE_MAX = 90
+LONGITUDE_MIN = -180
+LONGITUDE_MAX = 180
+
+LATITUDE_VALIDATORS = [MinValueValidator(LATITUDE_MIN), MaxValueValidator(LATITUDE_MAX)]
+LONGITUDE_VALIDATORS = [
+    MinValueValidator(LONGITUDE_MIN),
+    MaxValueValidator(LONGITUDE_MAX),
+]
+
 
 class RideStatus(models.TextChoices):
     EN_ROUTE = "en-route", "En Route"
@@ -38,19 +49,11 @@ class Ride(models.Model):
         db_column="id_driver",
     )
 
-    pickup_latitude = models.FloatField(
-        validators=[MinValueValidator(-90), MaxValueValidator(90)]
-    )
-    pickup_longitude = models.FloatField(
-        validators=[MinValueValidator(-180), MaxValueValidator(180)]
-    )
+    pickup_latitude = models.FloatField(validators=LATITUDE_VALIDATORS)
+    pickup_longitude = models.FloatField(validators=LONGITUDE_VALIDATORS)
 
-    dropoff_latitude = models.FloatField(
-        validators=[MinValueValidator(-90), MaxValueValidator(90)]
-    )
-    dropoff_longitude = models.FloatField(
-        validators=[MinValueValidator(-180), MaxValueValidator(180)]
-    )
+    dropoff_latitude = models.FloatField(validators=LATITUDE_VALIDATORS)
+    dropoff_longitude = models.FloatField(validators=LONGITUDE_VALIDATORS)
 
     # unsure if this is estimated pickup time or actual pickup time (if so, this should be nullable)
     pickup_time = models.DateTimeField(db_index=True)
@@ -61,22 +64,29 @@ class Ride(models.Model):
         ordering = ["id_ride"]
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(pickup_latitude__gte=-90, pickup_latitude__lte=90),
+                condition=models.Q(
+                    pickup_latitude__gte=LATITUDE_MIN, pickup_latitude__lte=LATITUDE_MAX
+                ),
                 name="ride_pickup_latitude_range",
             ),
             models.CheckConstraint(
                 condition=models.Q(
-                    pickup_longitude__gte=-180, pickup_longitude__lte=180
+                    pickup_longitude__gte=LONGITUDE_MIN,
+                    pickup_longitude__lte=LONGITUDE_MAX,
                 ),
                 name="ride_pickup_longitude_range",
             ),
             models.CheckConstraint(
-                condition=models.Q(dropoff_latitude__gte=-90, dropoff_latitude__lte=90),
+                condition=models.Q(
+                    dropoff_latitude__gte=LATITUDE_MIN,
+                    dropoff_latitude__lte=LATITUDE_MAX,
+                ),
                 name="ride_dropoff_latitude_range",
             ),
             models.CheckConstraint(
                 condition=models.Q(
-                    dropoff_longitude__gte=-180, dropoff_longitude__lte=180
+                    dropoff_longitude__gte=LONGITUDE_MIN,
+                    dropoff_longitude__lte=LONGITUDE_MAX,
                 ),
                 name="ride_dropoff_longitude_range",
             ),
