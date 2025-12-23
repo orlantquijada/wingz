@@ -1,11 +1,16 @@
-from django.db.models import QuerySet
+import logging
+
+from django.db import connection, reset_queries
 from rest_framework import viewsets
+from django.conf import settings
 
 from api.permissions import IsAdminUser
 
 from .models import Ride
 from .pagination import RidePagination
 from .serializers import RideSerializer, RideQueryParamsSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class RideViewSet(viewsets.ModelViewSet):
@@ -47,3 +52,14 @@ class RideViewSet(viewsets.ModelViewSet):
                     )
 
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        if settings.DEBUG:
+            reset_queries()
+
+        response = super().list(request, *args, **kwargs)
+
+        if settings.DEBUG:
+            logger.debug(f"{len(connection.queries)} queries")
+
+        return response
