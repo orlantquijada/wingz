@@ -58,6 +58,7 @@ class Ride(models.Model):
     objects = RideManager()
 
     class Meta:
+        ordering = ["id_ride"]
         constraints = [
             models.CheckConstraint(
                 condition=models.Q(pickup_latitude__gte=-90, pickup_latitude__lte=90),
