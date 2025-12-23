@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from api.permissions import IsAdminUser
 
 from .models import Ride
+from .pagination import RidePagination
 from .serializers import RideSerializer, RideQueryParamsSerializer
 
 
@@ -11,8 +12,9 @@ class RideViewSet(viewsets.ModelViewSet):
     queryset = Ride.objects.all()
     serializer_class = RideSerializer
     permission_classes = [IsAdminUser]
+    pagination_class = RidePagination
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self):
         queryset = (
             super()
             .get_queryset()
